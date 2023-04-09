@@ -1,26 +1,17 @@
 //importando a dependência express
 import express from 'express'
 
-//
-import cors from 'cors';
-
 //importar a dependência @prisma/cliente
 import { PrismaClient } from '@prisma/client';
 
 //importação da função para conversão de horas em minutos.
 import { convertHourStringToMinutes } from './utils/convert-hour-string-to-minutes';
 
-//importação da função para conversão de minutos em horas.
-import { convertMinutesToHourString } from './utils/convert-minutes-string-to-hours-string';
-
 //criando a aplicação
 const app = express()
 
 //permite que o express entenda formato Json 
-app.use(express.json())
-
-//definindo quais front-ends irão acessar nosso back-end, nesse caso, todos.
-app.use(cors())
+app.use(express.json)
 
 //criar a conexão com o DB 
 const prisma = new PrismaClient({
@@ -66,7 +57,7 @@ app.post('/games/:id/ads', async (request, response) => {
             useVoiceChanel: body.useVoiceChanel,
         }
     })
-
+    console.log('cheguei');
     return response.status(201).json(ad);
 });
 
@@ -74,7 +65,6 @@ app.post('/games/:id/ads', async (request, response) => {
 //www.minhaplicação.ads
 // o segundo parametro da função get, tem dois parametros, primeiro a requisição (request) segundo resposta (response) e ao fim da função
 //deve sempre ter um retorn (return)
-//Rota listagem dos anúncios
 app.get('/games/:id/ads', async (request, response) => {
     //recebendo o valor passado por params
     const gameId = request.params.id
@@ -88,7 +78,6 @@ app.get('/games/:id/ads', async (request, response) => {
             useVoiceChanel: true,
             yearsPlaying: true,
             HourStart: true,
-            HourEnd: true,
         }, 
         where: {
             gameId,
@@ -100,13 +89,10 @@ app.get('/games/:id/ads', async (request, response) => {
 
     //O bacn-end da aplicação sempre retornará um Json
     //percorrerá pelo "ads" e formatará os dados de dados da semana
-    //no retorno será convertido as horas em number para 18:00
     return response.json(ads.map(ad => {
         return {
             ...ad,
-            weekDays: ad.weekDays.split(','),
-            HourStart: convertMinutesToHourString(ad.HourStart),
-            HourEnd: convertMinutesToHourString(ad.HourEnd),
+            weekDays: ad.weekDays.split(',')
         }
     }))
 })
@@ -131,5 +117,5 @@ app.get('/ads/:id/discord', async (request, response) => {
         discord: ad.discord,
     });
 })
-//porta da aplicação (Fica ouvindo requisições e não para, a menos que o user peça para parar)
-app.listen(3334)
+//porta da aplicação (Fica ouvindo requisições e mão para, a menos que o user peça para parar)
+app.listen(3333)
